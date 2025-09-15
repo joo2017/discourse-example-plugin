@@ -1,0 +1,6 @@
+plugins:
+  example_plugin_enabled:
+    default: true
+    client: true
+    type: bool
+    description: "启用示例插件功能"
