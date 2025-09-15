@@ -1,5 +1,4 @@
 import { withPluginApi } from "discourse/lib/plugin-api";
-import { service } from "@ember/service";
 
 function initializeExamplePlugin(api) {
   // 添加工具栏按钮
@@ -9,7 +8,7 @@ function initializeExamplePlugin(api) {
       group: "extras",
       icon: "magic",
       title: "example_plugin.toolbar_button.title",
-      perform: (e) => showExampleModal(e),
+      perform: (toolbarEvent) => showExampleModal(toolbarEvent),
     });
   });
 
@@ -17,7 +16,8 @@ function initializeExamplePlugin(api) {
   function showExampleModal(toolbarEvent) {
     const modal = toolbarEvent.appliedTo.container.lookup("service:modal");
     
-    import("discourse/components/example-modal").then((module) => {
+    // 动态导入 .gjs 组件
+    import("../components/example-modal").then((module) => {
       const ExampleModal = module.default;
       
       modal.show(ExampleModal, {
