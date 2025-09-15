@@ -1,0 +1,12 @@
+en:
+  js:
+    example_plugin:
+      toolbar_button:
+        title: "插入示例内容"
+        text: "示例"
+      modal:
+        title: "示例模态框"
+        body: "这是一个示例模态框的内容"
+        submit: "提交"
+        cancel: "取消"
+        input_placeholder: "请输入内容..."
