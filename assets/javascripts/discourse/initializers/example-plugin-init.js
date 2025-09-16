@@ -1,51 +1,35 @@
 import { withPluginApi } from "discourse/lib/plugin-api";
-import DiscoursePostEventEvent from "discourse/plugins/discourse-calendar/discourse/models/discourse-post-event-event";
-import PostEventBuilder from "../components/modal/post-event-builder";
-
-function initializeEventBuilder(api) {
-  const currentUser = api.getCurrentUser();
-  const modal = api.container.lookup("service:modal");
-
-  api.addComposerToolbarPopupMenuOption({
-    action: (toolbarEvent) => {
-      const event = DiscoursePostEventEvent.create({
-        status: "public",
-        starts_at: moment(),
-        timezone: moment.tz.guess(),
-      });
-
-      modal.show(PostEventBuilder, {
-        model: { event, toolbarEvent },
-      });
-    },
-    group: "insertions",
-    icon: "calendar-day",
-    label: "discourse_post_event.builder_modal.attach",
-    condition: (composer) => {
-      if (!currentUser || !currentUser.can_create_discourse_post_event) {
-        return false;
-      }
-
-      const composerModel = composer.model;
-      return (
-        composerModel &&
-        !composerModel.replyingToTopic &&
-        (composerModel.topicFirstPost ||
-          composerModel.creatingPrivateMessage ||
-          (composerModel.editingPost &&
-            composerModel.post &&
-            composerModel.post.post_number === 1))
-      );
-    },
-  });
-}
+import I18n from "I18n";
+import ExampleModal from "../components/modal/example-modal";
 
 export default {
-  name: "add-post-event-builder",
+  name: "initialize-example-plugin-toolbar-button",
   initialize(container) {
-    const siteSettings = container.lookup("service:site-settings");
-    if (siteSettings.discourse_post_event_enabled) {
-      withPluginApi("0.8.7", initializeEventBuilder);
+    const siteSettings = container.lookup("site-settings:main");
+    if (!siteSettings.example_plugin_enabled) {
+      return;
     }
+
+    withPluginApi("1.0.0", (api) => {
+      api.onToolbarCreate((toolbar) => {
+        toolbar.addButton({
+          id: "example-modal-button",
+          group: "insertions",
+          icon: "calendar-days", // 使用 FontAwesome 图标名，与日历插件一致
+          title: I18n.t("js.example_plugin.header_button"),
+          action() {
+            const modal = api.container.lookup("service:modal");
+            modal.show(ExampleModal, {
+              model: {
+                title: I18n.t("js.example_plugin.modal.title"),
+                content: I18n.t("js.example_plugin.modal.content"),
+                closeText: I18n.t("js.example_plugin.modal.close_button"),
+                // 可以根据业务扩展传参，如 insertText callback
+              },
+            });
+          },
+        });
+      });
+    });
   },
 };
