@@ -1,20 +1,22 @@
-.example-modal {
-  min-width: 400px;
-
-  .example-modal__body {
-    margin-bottom: 1em;
-  }
-
-  .example-modal__input {
-    width: 100%;
-    box-sizing: border-box;
-    margin-top: 1em;
-    padding: 8px;
-  }
-
-  .example-modal__footer {
-    display: flex;
-    gap: 0.5em;
-    justify-content: flex-end;
-  }
-}
+en:
+  js:
+    example_plugin:
+      composer_title: "Insert Event"
+      builder_modal:
+        title: "Insert Event"
+        create: "Insert"
+        update: "Update"
+        all_day: "All Day"
+        from: "From"
+        to: "To"
+        optional: "optional"
+        timezone: "Timezone"
+        recurrency:
+          none: "No Recurrence"
+          every_day: "Every Day"
+          every_week: "Every Week"
+          every_month: "Every Month"
+          every_year: "Every Year"
+        name:
+          label: "Name"
+          placeholder: "e.g. My Awesome Event"
