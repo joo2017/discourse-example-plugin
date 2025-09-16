@@ -1,45 +1,45 @@
 import { withPluginApi } from "discourse/lib/plugin-api";
 
 function initializeExamplePlugin(api) {
-  // 添加工具栏按钮 - 使用简单的文本插入方式
+  // 简单的工具栏按钮
   api.onToolbarCreate((toolbar) => {
     toolbar.addButton({
       id: "example_plugin_button",
       group: "extras",
       icon: "magic",
-      title: "example_plugin.toolbar_button.title",
+      title: "插入示例内容",
       perform: (e) => {
-        // 使用官方的 applySurround 方法
-        e.applySurround(
-          "[example]",
-          "[/example]",
-          "example_text"
-        );
+        // 直接插入文本，不使用模态框
+        e.applySurround("[example]", "[/example]", "示例文本");
       }
     });
   });
 
-  // 如果需要模态框，使用官方的方式
+  // 带模态框的按钮（在下拉菜单中）
   api.addComposerToolbarPopupMenuOption({
-    action: "insertExampleModal",
+    action: "showExampleModal",
     icon: "magic",
-    label: "example_plugin.modal.title"
+    label: "插入示例（模态框）"
   });
 
   api.modifyClass("controller:composer", {
     pluginId: "discourse-example-plugin",
     actions: {
-      insertExampleModal() {
-        const modal = this.modal;
+      showExampleModal() {
+        console.log("Opening modal...");
         
-        // 创建简单的模态框内容
-        const inputValue = prompt("请输入要插入的内容:");
-        if (inputValue && inputValue.trim()) {
-          this.get("toolbarEvent").applySurround(
-            `[example]`,
-            `[/example]`,
-            inputValue.trim()
-          );
+        // 使用最简单的方式：直接创建模态框内容
+        const text = prompt("请输入要插入的内容:");
+        if (text && text.trim()) {
+          console.log("Inserting text:", text);
+          // 使用 toolbarEvent
+          if (this.toolbarEvent) {
+            this.toolbarEvent.applySurround(
+              "[example]",
+              "[/example]", 
+              text.trim()
+            );
+          }
         }
       }
     }
