@@ -1,66 +1,46 @@
 import { withPluginApi } from "discourse/lib/plugin-api";
+import I18n from "I18n";
 
-function initializeExamplePlugin(api) {
-  // 简单的工具栏按钮
-  api.onToolbarCreate((toolbar) => {
-    toolbar.addButton({
-      id: "example_plugin_button", 
-      group: "extras",
-      icon: "magic",
-      title: "插入示例内容",
-      perform: (e) => {
-        // 直接插入文本
-        e.applySurround("[example]", "[/example]", "示例文本");
-      }
-    });
-  });
-
-  // 带模态框的按钮（在工具栏下拉菜单中）
-  api.addComposerToolbarPopupMenuOption({
-    action: "showExampleModal",
-    icon: "far-window-maximize",
-    label: "插入示例（模态框）"
-  });
-
-  api.modifyClass("controller:composer", {
-    pluginId: "discourse-example-plugin",
-    actions: {
-      showExampleModal() {
-        console.log("Opening modal...");
-        
-        const modal = this.modal;
-        
-        // 静态导入 .gjs 组件
-        import("../components/example-modal").then((module) => {
-          const ExampleModal = module.default;
-          
-          modal.show(ExampleModal, {
-            model: {
-              toolbarEvent: this.toolbarEvent,
-              insertText: (text) => {
-                console.log("Inserting:", text);
-                if (this.toolbarEvent) {
-                  this.toolbarEvent.applySurround("", "", text);
-                }
-              }
-            }
-          });
-        }).catch((error) => {
-          console.error("Failed to load modal:", error);
-          // 备用方案
-          const text = prompt("请输入内容:");
-          if (text && this.toolbarEvent) {
-            this.toolbarEvent.applySurround("[example]", "[/example]", text);
-          }
-        });
-      }
-    }
-  });
-}
+// 确保这里使用的是正确的相对路径！
+import ExampleModal from "../components/modal/example-modal";
 
 export default {
-  name: "example-plugin-init",
-  initialize() {
-    withPluginApi("0.8.7", initializeExamplePlugin);
+  name: "initialize-example-plugin-toolbar-button",
+
+  initialize(container) {
+    const siteSettings = container.lookup("site-settings:main");
+    if (!siteSettings.example_plugin_enabled) {
+      return;
+    }
+
+    withPluginApi("1.0.0", (api) => {
+      api.onToolbarCreate((toolbar) => {
+        toolbar.addButton({
+          id: "example-modal-button",
+          group: "insertions",
+          icon: "magic",
+          title: "js.example_plugin.header_button",
+
+          // ==========================================================
+          // 关键在这里：这个 action 函数是用来打开模态框的
+          // 它不是用来插入文本的
+          // ==========================================================
+          action() {
+            // 1. 获取 modal 服务
+            const modal = api.container.lookup("service:modal");
+            
+            // 2. 调用 modal.show() 并传入我们导入的组件
+            modal.show(ExampleModal, {
+              model: {
+                title: I18n.t("js.example_plugin.modal.title"),
+                content: I18n.t("js.example_plugin.modal.content"),
+                closeText: I18n.t("js.example_plugin.modal.close_button"),
+              },
+            });
+          },
+          // ==========================================================
+        });
+      });
+    });
   },
 };
