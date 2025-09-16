@@ -1,4 +1,5 @@
 import { withPluginApi } from "discourse/lib/plugin-api";
+import { service } from "@ember/service";
 
 function initializeExamplePlugin(api) {
   api.onToolbarCreate((toolbar) => {
@@ -7,30 +8,40 @@ function initializeExamplePlugin(api) {
       group: "extras",
       icon: "magic",
       title: "example_plugin.toolbar_button.title",
-      perform: async (toolbarEvent) => {
-        console.log("Button clicked!"); // 调试信息
+      sendAction: (event) => toolbar.context.send("showExampleModal", event),
+    });
+  });
+
+  // 修改 d-editor 组件来处理模态框
+  api.modifyClass("component:d-editor", {
+    modal: service(),
+    pluginId: "discourse-example-plugin",
+    
+    actions: {
+      showExampleModal(toolbarEvent) {
+        console.log("Showing modal with toolbar event:", toolbarEvent);
         
-        const modal = toolbarEvent.appliedTo.container.lookup("service:modal");
-        
-        // 动态导入 .gjs 组件
-        try {
-          const { default: ExampleModal } = await import("../components/example-modal");
+        import("../components/example-modal").then((module) => {
+          const ExampleModal = module.default;
           
-          modal.show(ExampleModal, {
+          this.modal.show(ExampleModal, {
             model: {
+              toolbarEvent: toolbarEvent,
               insertText: (text) => {
-                toolbarEvent.appliedTo.appEvents.trigger(
-                  "composer:insert-text",
-                  text
-                );
+                if (toolbarEvent && toolbarEvent.addText) {
+                  toolbarEvent.addText(text);
+                } else {
+                  // 备用方案：直接操作编辑器
+                  this.appEvents.trigger("composer:insert-text", text);
+                }
               }
             }
           });
-        } catch (error) {
+        }).catch((error) => {
           console.error("Failed to load modal component:", error);
-        }
-      },
-    });
+        });
+      }
+    }
   });
 }
 
