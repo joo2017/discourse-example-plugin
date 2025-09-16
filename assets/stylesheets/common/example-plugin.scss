@@ -1,0 +1,55 @@
+.event-builder-modal {
+  .modal-body {
+    padding-bottom: 0;
+  }
+
+  .event-field {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1em;
+
+    label {
+      flex: 0 0 100px;
+      font-weight: normal;
+      margin: 0;
+    }
+
+    .event-field-input {
+      width: 100%;
+
+      input[type="text"],
+      input[type="date"],
+      input[type="time"] {
+        width: 100%;
+        max-width: 250px;
+      }
+    }
+
+    .select-kit.single-select {
+      max-width: 250px;
+    }
+
+    .event-date-fields,
+    .event-time-fields {
+      display: flex;
+      align-items: center;
+
+      .event-time-input,
+      .event-date-input {
+        flex: 1;
+      }
+
+      .separator {
+        margin: 0 0.5em;
+      }
+    }
+
+    .d-button.btn-flat {
+      margin-left: 0.5em;
+    }
+  }
+
+  .event-allday-field {
+    margin-left: 100px; // align with other inputs
+  }
+}
