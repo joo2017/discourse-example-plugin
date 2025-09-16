@@ -1,33 +1,31 @@
 import { withPluginApi } from "discourse/lib/plugin-api";
 import I18n from "I18n";
-import ExampleModal from "../components/modal/example-modal";
+
+// 导入我们新的、从 calendar 复制过来的模态框组件
+import EventBuilderModal from "../components/modal/event-builder-modal";
 
 export default {
-  name: "initialize-example-plugin-toolbar-button",
+  name: "initialize-example-event-button",
+
   initialize(container) {
     const siteSettings = container.lookup("site-settings:main");
-    if (!siteSettings.example_plugin_enabled) {
-      return;
-    }
+    // 您可以在后台设置中添加一个 `example_plugin_enabled` 的开关来控制插件是否启用
+    // if (!siteSettings.example_plugin_enabled) {
+    //   return;
+    // }
 
     withPluginApi("1.0.0", (api) => {
-      api.onToolbarCreate((toolbar) => {
-        toolbar.addButton({
-          id: "example-modal-button",
-          group: "insertions",
-          icon: "calendar-days", // 使用 FontAwesome 图标名，与日历插件一致
-          title: I18n.t("js.example_plugin.header_button"),
-          action() {
+      // discourse-calendar 是将按钮添加到下拉菜单中的，我们模仿它
+      api.addToolbarPopupMenuOptions((options) => {
+        options.add("insertEvent", {
+          action: () => {
             const modal = api.container.lookup("service:modal");
-            modal.show(ExampleModal, {
-              model: {
-                title: I18n.t("js.example_plugin.modal.title"),
-                content: I18n.t("js.example_plugin.modal.content"),
-                closeText: I18n.t("js.example_plugin.modal.close_button"),
-                // 可以根据业务扩展传参，如 insertText callback
-              },
-            });
+            // 将 toolbar 实例传递给模态框，这样模态框内部才能调用 insertBlock
+            const toolbar = options.toolbar; 
+            modal.show(EventBuilderModal, { model: { toolbar } });
           },
+          icon: "calendar-alt",
+          label: "js.example_plugin.composer_title",
         });
       });
     });
