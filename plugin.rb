@@ -11,5 +11,5 @@ enabled_site_setting :example_plugin_enabled
 register_asset "stylesheets/example-plugin.scss"
 
 after_initialize do
-  # 服务器端初始化代码（如需要）
+  # 服务器端初始化代码
 end
