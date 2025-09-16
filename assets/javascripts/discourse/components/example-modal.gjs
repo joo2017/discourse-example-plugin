@@ -12,12 +12,16 @@ export default class ExampleModal extends Component {
   @action
   updateInput(event) {
     this.inputValue = event.target.value;
+    console.log("Input value updated:", this.inputValue);
   }
 
   @action
   insertExample() {
+    console.log("Insert button clicked, input value:", this.inputValue);
+    
     if (this.inputValue && this.inputValue.trim()) {
       const textToInsert = `[example]${this.inputValue.trim()}[/example]`;
+      console.log("Text to insert:", textToInsert);
       
       // 使用传递的 insertText 函数
       if (this.args.model && this.args.model.insertText) {
@@ -25,6 +29,7 @@ export default class ExampleModal extends Component {
       }
     }
     
+    // 关闭模态框
     this.args.closeModal();
   }
 
@@ -44,6 +49,7 @@ export default class ExampleModal extends Component {
             placeholder="输入内容..."
             type="text"
             class="form-control"
+            style="width: 100%; padding: 8px; margin-top: 10px;"
           />
         </div>
       </:body>
