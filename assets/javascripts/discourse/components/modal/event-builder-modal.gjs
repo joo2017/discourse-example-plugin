@@ -8,6 +8,7 @@ import moment from "moment-timezone";
 // 定义时区列表
 const TIMEZONES = moment.tz.names();
 
+// JavaScript 逻辑部分
 export default class EventBuilderModal extends Component {
   @service currentUser;
 
@@ -70,7 +71,8 @@ export default class EventBuilderModal extends Component {
   }
 }
 
-// 模态框的模板
+// 模板部分
+// 关键：<template> 必须在 class 定义的外部！
 <template>
   <DModal
     @title={{I18n.t "js.example_plugin.builder_modal.title"}}
