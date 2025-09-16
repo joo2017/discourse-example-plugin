@@ -11,7 +11,7 @@ export default class ExampleModal extends Component {
   }
 }
 
-// <template> 块必须在 class {} 的外部
+// 关键：<template> 块必须在 class {} 的外部
 <template>
   <DModal @title={{@model.title}} @closeModal={{this.close}}>
     <DModalBody>
