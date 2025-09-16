@@ -4,21 +4,21 @@ function initializeExamplePlugin(api) {
   // 简单的工具栏按钮
   api.onToolbarCreate((toolbar) => {
     toolbar.addButton({
-      id: "example_plugin_button",
+      id: "example_plugin_button", 
       group: "extras",
       icon: "magic",
       title: "插入示例内容",
       perform: (e) => {
-        // 直接插入文本，不使用模态框
+        // 直接插入文本
         e.applySurround("[example]", "[/example]", "示例文本");
       }
     });
   });
 
-  // 带模态框的按钮（在下拉菜单中）
+  // 带模态框的按钮（在工具栏下拉菜单中）
   api.addComposerToolbarPopupMenuOption({
     action: "showExampleModal",
-    icon: "magic",
+    icon: "far-window-maximize",
     label: "插入示例（模态框）"
   });
 
@@ -28,19 +28,31 @@ function initializeExamplePlugin(api) {
       showExampleModal() {
         console.log("Opening modal...");
         
-        // 使用最简单的方式：直接创建模态框内容
-        const text = prompt("请输入要插入的内容:");
-        if (text && text.trim()) {
-          console.log("Inserting text:", text);
-          // 使用 toolbarEvent
-          if (this.toolbarEvent) {
-            this.toolbarEvent.applySurround(
-              "[example]",
-              "[/example]", 
-              text.trim()
-            );
+        const modal = this.modal;
+        
+        // 静态导入 .gjs 组件
+        import("../components/example-modal").then((module) => {
+          const ExampleModal = module.default;
+          
+          modal.show(ExampleModal, {
+            model: {
+              toolbarEvent: this.toolbarEvent,
+              insertText: (text) => {
+                console.log("Inserting:", text);
+                if (this.toolbarEvent) {
+                  this.toolbarEvent.applySurround("", "", text);
+                }
+              }
+            }
+          });
+        }).catch((error) => {
+          console.error("Failed to load modal:", error);
+          // 备用方案
+          const text = prompt("请输入内容:");
+          if (text && this.toolbarEvent) {
+            this.toolbarEvent.applySurround("[example]", "[/example]", text);
           }
-        }
+        });
       }
     }
   });
