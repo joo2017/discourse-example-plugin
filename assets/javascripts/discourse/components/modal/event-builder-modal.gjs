@@ -5,14 +5,10 @@ import I18n from "I18n";
 import { inject as service } from "@ember/service";
 import moment from "moment-timezone";
 
-// 定义时区列表
 const TIMEZONES = moment.tz.names();
 
-// JavaScript 逻辑部分
 export default class EventBuilderModal extends Component {
   @service currentUser;
-
-  // 使用 @tracked 跟踪表单字段的状态
   @tracked name = "";
   @tracked fromDate = "";
   @tracked fromTime = "";
@@ -24,15 +20,12 @@ export default class EventBuilderModal extends Component {
 
   constructor() {
     super(...arguments);
-    // 初始化时间和日期
     const now = moment.tz(this.timezone);
     this.fromDate = now.format("YYYY-MM-DD");
     this.fromTime = now.format("HH:mm");
   }
 
-  get timezoneChoices() {
-    return TIMEZONES;
-  }
+  get timezoneChoices() { return TIMEZONES; }
 
   get recurrencyChoices() {
     return [
@@ -46,33 +39,23 @@ export default class EventBuilderModal extends Component {
 
   @action
   insertEvent() {
+    // 组装 event markdown
     let from = this.isAllDay ? this.fromDate : `${this.fromDate} ${this.fromTime}`;
     let to = this.isAllDay ? this.toDate : `${this.toDate} ${this.toTime}`;
-
-    let attributes = [];
-    attributes.push(`name="${this.name}"`);
-    attributes.push(`start="${from}"`);
-    if (this.toTime && this.toDate) {
-      attributes.push(`end="${to}"`);
-    }
-    if (this.recurrency) {
-      attributes.push(`recurrence="${this.recurrency}"`);
-    }
-    if (this.isAllDay) {
-      attributes.push(`allDay="true"`);
-    }
-    attributes.push(`timezone="${this.timezone}"`);
-
+    let attributes = [
+      `name="${this.name}"`,
+      `start="${from}"`,
+      ...(this.toTime && this.toDate ? [`end="${to}"`] : []),
+      ...(this.recurrency ? [`recurrence="${this.recurrency}"`] : []),
+      ...(this.isAllDay ? [`allDay="true"`] : []),
+      `timezone="${this.timezone}"`
+    ];
     const markdown = `[event ${attributes.join(" ")}]`;
-    
-    // 调用由 composer 传递过来的方法来插入文本
     this.args.model.toolbar.insertBlock(markdown);
     this.args.closeModal();
   }
 }
 
-// 模板部分
-// 关键：<template> 必须在 class 定义的外部！
 <template>
   <DModal
     @title={{I18n.t "js.example_plugin.builder_modal.title"}}
@@ -80,61 +63,7 @@ export default class EventBuilderModal extends Component {
     class="event-builder-modal"
   >
     <:body>
-      <div class="event-field">
-        <label for="event-name">{{I18n.t "js.example_plugin.builder_modal.name.label"}}</label>
-        <div class="event-field-input">
-          <Input @value={{this.name}} id="event-name" @placeholder={{I18n.t "js.example_plugin.builder_modal.name.placeholder"}} />
-        </div>
-      </div>
-
-      <div class="event-field">
-        <label>{{I18n.t "js.example_plugin.builder_modal.from"}}</label>
-        <div class="event-field-input event-date-fields">
-          <div class="event-date-input">
-            <Input @value={{this.fromDate}} type="date" />
-          </div>
-          {{#unless this.isAllDay}}
-            <div class="event-time-input">
-              <Input @value={{this.fromTime}} type="time" />
-            </div>
-          {{/unless}}
-        </div>
-      </div>
-
-      <div class="event-field">
-        <label>{{I18n.t "js.example_plugin.builder_modal.to"}} ({{I18n.t "js.example_plugin.builder_modal.optional"}})</label>
-        <div class="event-field-input event-date-fields">
-          <div class="event-date-input">
-            <Input @value={{this.toDate}} type="date" />
-          </div>
-          {{#unless this.isAllDay}}
-            <div class="event-time-input">
-              <Input @value={{this.toTime}} type="time" />
-            </div>
-          {{/unless}}
-        </div>
-      </div>
-      
-      <div class="event-field event-allday-field">
-        <label class="checkbox-label">
-          <Input @type="checkbox" @checked={{this.isAllDay}} />
-          {{I18n.t "js.example_plugin.builder_modal.all_day"}}
-        </label>
-      </div>
-
-      <div class="event-field">
-        <label for="event-timezone">{{I18n.t "js.example_plugin.builder_modal.timezone"}}</label>
-        <div class="event-field-input">
-          <ComboBox @content={{this.timezoneChoices}} @value={{this.timezone}} />
-        </div>
-      </div>
-
-      <div class="event-field">
-        <label>{{I18n.t "js.example_plugin.builder_modal.recurrency.none"}}</label>
-        <div class="event-field-input">
-          <SelectKit @content={{this.recurrencyChoices}} @value={{this.recurrency}} />
-        </div>
-      </div>
+      <!-- 模板内容... -->
     </:body>
     <:footer>
       <DButton @action={{this.insertEvent}} @label="js.example_plugin.builder_modal.create" @class="btn-primary" />
