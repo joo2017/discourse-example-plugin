@@ -13,7 +13,7 @@ export default {
           perform: () => {
             const modal = api.container.lookup("service:modal");
             
-            // 使用相对路径导入
+            // 使用正确的相对路径导入 .gjs 文件
             import("../components/modal/example-modal").then((module) => {
               const ExampleModal = module.default;
               modal.show(ExampleModal, {
