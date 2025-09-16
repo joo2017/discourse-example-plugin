@@ -1,43 +1,59 @@
 import { withPluginApi } from "discourse/lib/plugin-api";
 
 function initializeExamplePlugin(api) {
-  // 添加工具栏按钮
   api.onToolbarCreate((toolbar) => {
     toolbar.addButton({
       id: "example-plugin-button",
       group: "extras",
       icon: "magic",
       title: "example_plugin.toolbar_button.title",
-      perform: (toolbarEvent) => showExampleModal(toolbarEvent),
+      perform: (toolbarEvent) => {
+        console.log("Button clicked!"); // 调试信息
+        showExampleModal(toolbarEvent);
+      },
     });
   });
 
-  // 显示模态框的函数
   function showExampleModal(toolbarEvent) {
+    console.log("Showing modal..."); // 调试信息
+    
     const modal = toolbarEvent.appliedTo.container.lookup("service:modal");
     
-    // 动态导入 .gjs 组件
-    import("../components/example-modal").then((module) => {
-      const ExampleModal = module.default;
-      
-      modal.show(ExampleModal, {
-        model: {
-          toolbarEvent: toolbarEvent,
-          insertText: (text) => {
-            toolbarEvent.appliedTo.appEvents.trigger(
-              "composer:insert-text",
-              text
-            );
-          }
+    // 使用同步方式创建简单模态框
+    modal.show(SimpleExampleModal, {
+      model: {
+        toolbarEvent: toolbarEvent,
+        insertText: (text) => {
+          toolbarEvent.appliedTo.appEvents.trigger(
+            "composer:insert-text",
+            text
+          );
         }
-      });
+      }
     });
+  }
+}
+
+// 简单的模态框组件类
+class SimpleExampleModal {
+  static modalClass = "example-modal";
+  
+  constructor() {
+    this.inputValue = "";
+  }
+  
+  submitModal() {
+    if (this.inputValue.trim()) {
+      const textToInsert = `[example]${this.inputValue}[/example]`;
+      this.model.insertText(textToInsert);
+      this.closeModal();
+    }
   }
 }
 
 export default {
   name: "example-plugin-init",
   initialize() {
-    withPluginApi("0.12.0", initializeExamplePlugin);
+    withPluginApi("0.8.0", initializeExamplePlugin);
   },
 };
