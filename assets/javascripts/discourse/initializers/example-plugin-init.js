@@ -1,19 +1,14 @@
 import { withPluginApi } from "discourse/lib/plugin-api";
 import I18n from "I18n";
 
-// 导入我们新的、从 calendar 复制过来的模态框组件
+// 确保导入的是正确的 .gjs 组件文件
 import EventBuilderModal from "../components/modal/event-builder-modal";
 
+// 初始化脚本导出一个普通的 JavaScript 对象，而不是一个 Class
 export default {
   name: "initialize-example-event-button",
 
   initialize(container) {
-    const siteSettings = container.lookup("site-settings:main");
-    // 您可以在后台设置中添加一个 `example_plugin_enabled` 的开关来控制插件是否启用
-    // if (!siteSettings.example_plugin_enabled) {
-    //   return;
-    // }
-
     withPluginApi("1.0.0", (api) => {
       // discourse-calendar 是将按钮添加到下拉菜单中的，我们模仿它
       api.addToolbarPopupMenuOptions((options) => {
